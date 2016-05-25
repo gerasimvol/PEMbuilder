@@ -1,0 +1,17 @@
+{
+  "name": "PEMbuider",
+  "description": "creating full crt.pem",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "forever start --minUptime 1000 --spinSleepTime 1000 app.js",
+    "stop": "forever stop app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "dateformat": "^1.0.12",
+    "express": "^4.13.4",
+    "forever": "^0.15.1",
+    "fs": "0.0.2",
+    "python-shell": "^0.4.0"
+  }
+}

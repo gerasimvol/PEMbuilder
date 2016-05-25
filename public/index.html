@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+    <head>
+        <title>PEMbuilder</title>
+
+
+        <!-- angular -->
+        <script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-rc.0/angular.min.js'></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-animate.min.js"></script>
+
+        <!-- loadingbar -->
+        <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.css' type='text/css' media='all' />
+        <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.js'></script>
+
+        <!-- alert box -->
+        <link rel="stylesheet" type="text/css" href="dist/angular-notify.css" />
+        <script type="text/javascript" src='dist/angular-notify.js'></script>
+
+        <!-- uikit -->
+        <link rel="stylesheet" type="text/css" href="src/uikit.docs.min.css" />
+        <link rel="stylesheet" type="text/css" href="src/mystyle.css" />
+
+        <!-- controller -->
+        <script type="text/javascript" src='controllers/controller.js'></script>
+
+    </head>
+
+    <body>
+    <div class="wrapper">
+
+        <div class="container my-container" ng-controller="AppCtrl" name="AppForm" ng-form>
+
+            <h1 align="center">PEMbuilder</h1>
+
+          <div class="uk-panel uk-panel-box uk-form">
+                  <input type="radio" name="type" id="start" value="start" ng-init="pem.type = 'start'" ng-checked="!checked" ng-model="pem.type"> <b>StartSSL Certificate</b><Br>
+                  <input type="radio" name="type" id="custom" value="custom"  ng-model="pem.type"> <b>Custom Certificate</b><Br>
+
+          </div>
+
+          <div class="uk-panel uk-panel-box uk-form">
+
+              <div ng-hide="pem.type =='custom'" ng-show="pem.type=='start'">
+                  <span class="uk-text-bold ">Domain name:</span><br>
+                  <input type="text" class="data"  placeholder="Enter the domain name" ng-class="AppForm.domain.$invalid ? '' : 'uk-form-success' " name="domain" ng-model="ssl.domain" required>
+
+                  <p></p>
+                  <button class="uk-button" ng-click="generateCsr()" ng-disabled="AppForm.domain.$invalid">Generate certificate</button>
+              </div>
+
+              <div ng-hide="pem.type =='start'" ng-show="pem.type=='custom'" >
+
+                  <label><input type="checkbox" id="noIntAndRoot" ng-init="pem.noIntAndRoot = true" ng-model="pem.noIntAndRoot"> Create certificate without intermediate and root</label>
+                  <p></p>
+
+                  <span class="uk-text-bold ">Name of the output .pem file:</span><br>
+                  <input type="text" class="data"  placeholder="Enter the name" ng-class="AppForm.name.$invalid ? '' : 'uk-form-success' " name="name" ng-model="pem.name" required>
+
+                  <p></p>
+                  <span class="uk-text-bold">Certificate:</span>
+                  <textarea id="crtHere" rows="3" cols="50" class="data" ng-class="AppForm.crt.$invalid ? '' : 'uk-form-success'" name="crt" ng-model="pem.crt" placeholder="Enter your certificate" required></textarea><br>
+                  <div class="uk-form-file">
+                      <button class="uk-button uk-button-mini">Paste from file</button>
+                      <input type="file" id="crtUploader">
+
+                  </div>
+
+
+                  <p></p>
+
+                  <div ng-hide="pem.noIntAndRoot == true">
+                      <span class="uk-text-bold">Intermediate:</span>
+                      <textarea id="intHere" rows="3" cols="50" class="data" ng-class="AppForm.int.$invalid ? '' : 'uk-form-success'" name="int" ng-model="pem.int" placeholder="Enter your intermediate" required></textarea><br>
+                      <div class="uk-form-file">
+                          <button class="uk-button uk-button-mini">Paste from file</button>
+                          <input type="file" id="intUploader">
+                      </div>
+                      <p></p>
+                      <span class="uk-text-bold">Root:</span>
+                      <textarea id="rootHere" rows="3" cols="50" class="data" ng-class="AppForm.root.$invalid ? '' : 'uk-form-success'" name="root" ng-model="pem.root" placeholder="Enter your root" required></textarea><br>
+                      <div class="uk-form-file">
+                          <button class="uk-button uk-button-mini">Paste from file</button>
+                          <input type="file" id="rootUploader">
+                      </div>
+                  </div>
+
+                  <p></p>
+                  <span class="uk-text-bold">Private key:</span>
+                  <textarea id="pkHere" rows="3" cols="50" class="data" ng-class="AppForm.pk.$invalid ? '' : 'uk-form-success'" name="pk" ng-model="pem.pk" placeholder="Enter your private key" required></textarea><br>
+                  <div class="uk-form-file">
+                      <button class="uk-button uk-button-mini ">Paste from file</button>
+                      <input type="file" id="pkUploader">
+                  </div>
+              </div>
+          </div>
+
+          <div class="uk-panel uk-panel-box uk-form" ng-hide="pem.type =='start'" ng-show="pem.type=='custom'">
+              <div ng-hide="pem.hasNoPass">
+                  <span class="uk-text-bold">Password:</span>
+                  <input id= "pass" class="data" ng-class="AppForm.pass.$invalid ? '' : 'uk-form-success'"  name="pass" ng-model="pem.pass" type="password" placeholder="Enter your password" required>
+              </div>
+
+             <label><input type="checkbox" id="hasNoPass" ng-init="pem.hasNoPass = true" ng-model="pem.hasNoPass"> My key has no password</label>
+              <p></p>
+              <button class="uk-button" ng-click="sendParts()" ng-disabled=
+              "
+              (!(pem.noIntAndRoot == true) || AppForm.name.$invalid || AppForm.crt.$invalid || AppForm.pk.$invalid || AppForm.pass.$invalid)
+
+              &&
+
+              (AppForm.name.$invalid || AppForm.crt.$invalid || AppForm.pk.$invalid
+              || AppForm.pass.$invalid || AppForm.int.$invalid || AppForm.root.$invalid)
+
+              &&
+
+              (!pem.hasNoPass || AppForm.name.$invalid || AppForm.crt.$invalid || AppForm.pk.$invalid || AppForm.int.$invalid || AppForm.root.$invalid)
+
+              &&
+
+              (!(pem.noIntAndRoot == true) ||  !pem.hasNoPass || AppForm.name.$invalid || AppForm.crt.$invalid || AppForm.pk.$invalid)
+
+              "
+              >Create full certificate</button>
+          </div>
+          <div class="uk-panel uk-panel-box uk-form" ng-show="buttons">
+                <p><button class="uk-button uk-button-success" ng-click="downloadPem()">Download full pem file</button></p>
+                <button class="uk-button uk-button-success" ng-click="showHidePem()">Show/hide full pem file</button>
+
+                <div class="result" ng-hide="fullpem" ng-show="fullpem"><textarea id="result" rows="20" cols="50" class="data">{{PEM}}</textarea></div>
+          </div>
+
+            <div class="log">
+                <button class="uk-button uk-button-mini" ng-click="log()">Show log in console</button>
+            </div>
+     </div>
+
+    </div>
+    </body>
+</html>

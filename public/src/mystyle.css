@@ -1,0 +1,23 @@
+textarea {
+    resize: none;
+}
+
+.wrapper{
+    text-align: center;
+}
+
+.my-container{
+    text-align: left;
+    padding: 10px;
+    display: inline-block;
+}
+
+.uk-panel{
+    width: 323px;
+    margin: 5px;
+}
+
+.log{
+    text-align: center;
+}
+
