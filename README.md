@@ -3,4 +3,3 @@ Builds full .pem files to be used in load balancers with SSL termination feature
 
 #### Requirements:
 * nodeJS v5.0+
-* python v3.5+
